@@ -14,7 +14,7 @@ namespace Service
             var results = _context.Query<CarHistory>
                 .Include(x => x.User)
                 .Include(x => x.Car)
-                .Where(x => x.Id == carId);
+                .Where(x => x.Id == carId && x.Current);
 
             return results.Select(mapper.map<CarHistoryDto>);
         }
