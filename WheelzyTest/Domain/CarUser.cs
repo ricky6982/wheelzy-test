@@ -9,4 +9,17 @@ public class CarHistory: Entity
     public bool Current { get; set; }
     public DateTime CreatedAt { get; set; }
     public User CreatedBy { get; set; }
+    public void DecreaseAmount(decimal amount)
+    {
+        if (amount <= 0)
+        {
+            throw new InvalidOperationException("Amount must be greater than 0");
+        }
+        if (amount > Amount)
+        {
+            throw new InvalidOperationException("Amount must be less than or equal to the current amount");
+        }
+        Amount -= amount;
+    }
 }
+

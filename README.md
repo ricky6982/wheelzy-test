@@ -1,6 +1,6 @@
-Summary
+# Summary
 
-Technical Assessment
+## Technical Assessment with solutions
 1) Define the database tables with its corresponding data types and relationships for the
    following case:
    A customer wants to sell his car so we need the car information (car year, make, model,
@@ -23,18 +23,72 @@ Technical Assessment
 
 2) What would you do if you had data that doesn’t change often but it’s used pretty much all
    the time?
+
+   - I would use a caching mechanism to store the data in memory. This would allow for faster access to the data and reduce the load on the database. For instance, I would add CacheManager in each endpoint of the API.
+   
+
 3) Analyze the following method and make changes to make it better. Explain your
    changes.
+ 
+```csharp
+public void UpdateCustomersBalanceByInvoices(List<Invoice> invoices)
+{
+    foreach (var invoice in invoices)
+    {
+        var customer =
+            dbContext.Customers.SingleOrDefault(invoice.CustomerId.Value);
+        customer.Balance -= invoice.Total;
+        dbContext.SaveChanges();
+    }
+}
+```
+Solution:
+
+```csharp
+
+public class InvoiceService : IInvoiceService // I guess this is the name of the service
+{
+   public ICustomerService CustomerService { get; set; } // Injected by DI
+   
    public void UpdateCustomersBalanceByInvoices(List<Invoice> invoices)
    {
-   foreach (var invoice in invoices)
-   {
-   var customer =
-   dbContext.Customers.SingleOrDefault(invoice.CustomerId.Value);
-   customer.Balance -= invoice.Total;
-   dbContext.SaveChanges();
+       var countSuccess = 0;
+       var countError = 0;
+       foreach (var invoice in invoices)
+       {
+           try 
+           {
+              CustomerService.DecreaseBalance(customer.Id, invoice.Total); // Delegate the responsibility to the CustomerService
+                countSuccess++;
+           }
+           catch (Exception ex)
+           {
+               // Log the exception but don't stop the process
+                countError++;
+           }
+       }
+         // Log the countSuccess and countError
    }
-   }
+}
+
+public class CustomerService : ICustomerService
+{
+    public Customer DecreaseBalance(int customerId, decimal amount)
+    {
+        var customer = dbContext.Customers.SingleOrDefault(customerId);
+        if (customer == null) // Add validation
+            throw new Exception("Customer not found");
+        
+        customer.Balance -= amount;
+        dbContext.SaveChanges();
+
+        return customer;
+    }
+}
+
+```
+
+
 4) Implement the following method using Entity Framework, making sure your query is
    efficient in all the cases (when all the parameters are set, when some of them are or
    when none of them are). If a “filter” is not set it means that it will not apply any filtering

@@ -4,7 +4,9 @@ namespace Service
 {
     public class CarService
     {
+        @Autowired
         public IApplicationDbContext _context;
+        @Autowired
         public IMapper _mapper;
 
         public IList<CarHistoryDto> GetCarHistory(int carId)
