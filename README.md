@@ -118,4 +118,13 @@ public async Task<List<OrderDTO>> GetOrders(DateTime dateFrom, DateTime dateTo, 
 }
 ```
 
+5) Bill, from the QA Department, assigned you a high priority task indicating there’s a bug when someone changes the status from “Accepted” to “Picked Up”.
 
+   Define how you would proceed, step by step, until you create the Pull Request.
+
+    - I would start by reproducing the bug in my local environment, with the help of the QA Department. Obviously, setting all the necessary data equal to the production environment. 
+    - Then I would create a new branch from the main branch, its name would be something like "fix/bug-accepted-to-picked-up".
+    - If there are tests, that none of them are failing, I would write a new test to reproduce the bug. 
+    - I would fix the bug and run the tests again.
+    - If all the tests are passing, I would push the branch to the remote repository and create a Pull Request, first to the test branch and then to the main branch.
+    
