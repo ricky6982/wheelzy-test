@@ -17,7 +17,7 @@
    Make sure your queries don’t have any unnecessary data.
 
    - 1-a ) The issue was resolved in the next file: [SqlFile](WheelzyTest/Persistence/ScriptDatabase.sql)
-   - 1-b ) The issue was resolved within a solution consisting of multiple projects utilizing .NET 7.
+   - 1-b ) The issue was resolved within a solution consisting of multiple projects utilizing .NET 7. You can find de Solution in the folder named WheelzyTest. 
      
      - The entity framework query was implemented in the following file: [CarService](WheelzyTest/Service/CarService.cs) 
 
@@ -94,5 +94,28 @@ public class CustomerService : ICustomerService
    when none of them are). If a “filter” is not set it means that it will not apply any filtering
    over that field (no ids provided for customer ids it means we don’t want to filter by
    customer).
+
+```csharp
+public async Task<List<OrderDTO>> GetOrders(DateTime dateFrom, DateTime dateTo, // I changed here the return type to List<OrderDTO> instead of a single OrderDTO because the method name is GetOrders.
+    List<int> customerIds, List<int> statusIds, bool? isActive)
+{
+    var query = dbContext.Orders
+        .Include(x => x.Customer)
+        .Where(x => x.Date >= dateFrom && x.Date <= dateTo);
+
+    if (customerIds != null && customerIds.Any())
+        query = query.Where(x => customerIds.Contains(x.Customer.Id));
+
+    if (statusIds != null && statusIds.Any())
+        query = query.Where(x => statusIds.Contains(x.StatusId));
+
+    if (isActive.HasValue)
+        query = query.Where(x => x.IsActive == isActive.Value);
+
+    var orders = await query.ToListAsync();
+
+    return orders.Select(mapper.Map<OrderDTO>).ToList(); // I consider that the project is using AutoMapper
+}
+```
 
 
